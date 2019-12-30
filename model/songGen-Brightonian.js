@@ -35,6 +35,8 @@ module.exports = class SongGenerator {
 
     this.song.BandName = "Brightonian";
     this.song.Tempo = 110 + (Math.random() * 20); //BPM;
+    this.song.Tempo = Math.floor(this.song.Tempo);
+	  
     //this.song.KeyOffset = 0; //4;
     this.song.KeyOffset = this.getRand(0,8) -4;
 
