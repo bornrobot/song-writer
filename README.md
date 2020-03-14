@@ -4,3 +4,5 @@ Song generator
 
 Influences:
 tempo, style, number of instruments etc.
+
+Output: Song library commands (store song)
