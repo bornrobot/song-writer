@@ -1,4 +1,3 @@
 Song generator
 
-* Generate song
-* save song
+* Generate and save song (number of songs)
