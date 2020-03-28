@@ -1,8 +1,11 @@
 Song generator
 
-* Generate and save song (number of songs, influences)
+* Generate songs ( perform, record, number of songs, influences)
 
 Influences:
 tempo, length, style, number of instruments etc.
 
-Output: Song library commands (store song)
+4 tracks / channels
+
+Output performance commands:
+Perform song ( song data, record )
