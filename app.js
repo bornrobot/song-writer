@@ -1,30 +1,37 @@
-const mysql = require('mysql');
+const http = require('http');
 const SongGenerator = require('./model/songGen-Brightonian');
 
-let config = require('./config.js');
-
-const db = mysql.createConnection(config);
-
-console.log('Connected to database');
-
 let songGen = new SongGenerator();
-
 songGen.create();
 
 var songJson  = JSON.stringify(songGen.song);
 
-let query = "INSERT INTO `tblSongs` (bandName, createdDate, json, liked, disliked, played)";
-query += " VALUES (";
-query += "'" + songGen.bandName + "'";
-query += ", NOW()";
-query += ", '" + songJson + "'";
-query += ", 0, 0, 0)";
+console.log(songJson);
 
-db.query(query, (err, result) => {
-  if (err) {
-    throw err;
+const options = {
+  hostname: 'localhost',
+  port: 5000,
+  path: '/perform',
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Content-Length': songJson.length
   }
-  console.log("Inserted new song.");
+};
+
+let req = http.request(options, (res) => {
+  console.log('statusCode: ${res.statusCode}');
+
+  res.on('data', (d) => {
+    process.stdout.write(d);
+    process.exit()
+  });
 });
 
-db.end();
+req.on('error', (error) => {
+  console.error(error);
+});
+
+req.write(songJson);
+req.end();
+req.shouldKeepAlive = false
