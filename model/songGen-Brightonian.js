@@ -5,6 +5,10 @@ const Musician = require('./musician');
 const TimeInterval = require('./timeInterval');
 const MusicNote = require('./MusicNote');
 
+const MELOD_IX = 0;
+const CHORD_IX = 1;
+const RYTHM_IX = 2;
+
 module.exports = class SongGenerator {
 
   constructor() {
@@ -61,7 +65,7 @@ module.exports = class SongGenerator {
 
     let ideaLen = 8;
 
-    //Start wiht Middle C
+    //Start with Middle C
     let pitch = 14 + this.song.KeyOffset;
 
     this.musicalIdea = new MusicalPattern();
@@ -80,6 +84,10 @@ module.exports = class SongGenerator {
 
     console.log(this);
 
+    // Melody
+    this.song.musicians.push( new Musician() );
+
+    // Chords
     this.song.musicians.push( new Musician() );
 
     this.addToMelody(this.musicalIdea);
@@ -89,25 +97,32 @@ module.exports = class SongGenerator {
 
     console.log("Build the song...");
 
-    //add rythm...
+    // Rythm / drummer...
     this.song.musicians.push( new Musician() );
 
     let firstRythmPattern = this.createRythmFromMelody(this.musicalIdea);
-    this.addToRythm(firstRythmPattern);
+    this.addToTrack(RYTHM_IX, firstRythmPattern);
+
+    let firstChordsPattern = this.createChordsFromMelody(this.musicalIdea);
+    this.addToTrack(CHORD_IX, firstChordsPattern);
 
     let nextMelodyPattern = this.developIdea(this.musicalIdea);
+    let nextChordsPattern = this.createChordsFromMelody(nextMelodyPattern);
     let nextRythmPattern = this.createRythmFromMelody(nextMelodyPattern);
 
-    for(let i = 0; this.song.musicians[0].timeIntervals.length < this.MaxTimeIntervals; i++) {
+    for(let i = 0; this.song.musicians[MELOD_IX].timeIntervals.length < this.MaxTimeIntervals; i++) {
 
       this.addToMelody(nextMelodyPattern);
-      this.addToRythm(nextRythmPattern);
+      this.addToTrack(CHORD_IX, nextChordsPattern);
+      this.addToTrack(RYTHM_IX, nextRythmPattern);
 
       if(this.getRand(0,10) > 0) { 
         nextMelodyPattern = this.developIdea(this.musicalIdea);
       } else {
  	nextMelodyPattern = this.developIdea(nextMelodyPattern);
       }
+
+      nextChordsPattern = this.createChordsFromMelody(nextMelodyPattern);
       nextRythmPattern = this.createRythmFromMelody(nextMelodyPattern);
     }
   }
@@ -117,48 +132,53 @@ module.exports = class SongGenerator {
     console.log(pattern);
     console.log("Add to melody: " + pattern.print() );
 
-    //let musician = this.song.musicians[0];
+    let track = this.song.musicians[MELOD_IX];
 
-    let ival = this.song.musicians[0].timeIntervals.length -1;
+    let ival = track.timeIntervals.length -1;
 
     for(let i=0; i < pattern.timeIntervals.length && ival < this.MaxTimeIntervals -1; i++) {
 
-      this.song.musicians[0].timeIntervals.push( new TimeInterval() );
+      track.timeIntervals.push( new TimeInterval() );
       ival++;
 
       for(let j=0; j < pattern.timeIntervals[i].notes.length; j++) {
-        this.song.musicians[0].timeIntervals[ival].notes.push( pattern.timeIntervals[i].notes[j].deepCopy() );
+        track.timeIntervals[ival].notes.push( pattern.timeIntervals[i].notes[j].deepCopy() );
       }
     }
-    if(this.song.musicians[0].timeIntervals.length == this.MaxTimeIntervals -1) {
+    if(track.timeIntervals.length == this.MaxTimeIntervals -1) {
 
-      this.song.musicians[0].timeIntervals.push( new TimeInterval() );
+      track.timeIntervals.push( new TimeInterval() );
 
-      this.song.musicians[0].timeIntervals[ival].notes.push( 
-        new Array(this.song.musicians[0].timeIntervals[0].notes[0].deepCopy())
+      track.timeIntervals[ival].notes.push( 
+        new Array(track.timeIntervals[0].notes[0].deepCopy())
       );
     }
   }
 
-  addToRythm(pattern) {
+  addToTrack(trackIndex, pattern) {
+    console.log("Add pattern to track ix " + trackIndex + " : " + pattern.print());
+    let track = this.song.musicians[trackIndex]; 
 
-    console.log("Add to rythm: " + pattern.print());
+    //set the tix to the end of the track...
+    let tix = track.timeIntervals.length; // -1;
 
-    let ival = this.song.musicians[1].timeIntervals.length -1;
-    
-    for(let i=0; i < pattern.timeIntervals[i].length && ival < this.MaxTimeIntervals; i++) {
+    //for each time interval in the pattern...
+    console.log("pattern interval count:" + pattern.timeIntervals.length);
+    console.log("total interval count:" + this.MaxTimeIntervals);
 
-      this.song.musicians[1].timeIntervals.push( new TimeInterval() );
-      ival++;
+    for(let i=0; i < pattern.timeIntervals.length && tix+i < this.MaxTimeIntervals; i++) {
 
+      //Add a new time interval to the track with the notes from the pattern...
+      track.timeIntervals.push( new TimeInterval() );
+
+      //copy each of the pattern notes in this interval...
       for(let j=0; j < pattern.timeIntervals[i].notes.length; j++) {
-
-        this.song.musicians[1].timeIntervals[ival].notes.push(
-          pattern.timeIntervals[i].notes[j].deepCopy());
+        track.timeIntervals[tix + i].notes.push(
+          pattern.timeIntervals[i].notes[j].deepCopy()
+        );
       }
     } 
-
-    this.patternIndex++;
+    console.log(this.song.musicians[trackIndex]); 
   }
 
   createRythmFromMelody(pattern) {
@@ -184,7 +204,7 @@ if(this.getRand(0,8) == 0) {
 
       let drum = 0;
       //switch(i%8) {
-      switch((this.song.musicians[1].timeIntervals.length + i)%8) {
+      switch((this.song.musicians[RYTHM_IX].timeIntervals.length + i)%8) {
         case 0:
           drum = drums[0];
           break;
@@ -201,6 +221,41 @@ if(this.getRand(0,8) == 0) {
     }
 
     return rythmicalIdea;
+  }
+
+  createChordsFromMelody(pattern) {
+
+    let chordsIdea = new MusicalPattern();
+
+    let pause = false;
+
+/*
+if(this.getRand(0,8) == 0) {
+  console.log("pause drums");
+  pause = true;
+}
+*/
+
+    for(let i=0; i < pattern.timeIntervals.length; i++) {
+
+      chordsIdea.timeIntervals.push(new TimeInterval());
+
+      let drum = 0;
+      switch(i%8) {
+        case 0:
+          drum = 1;
+          break;
+        default:
+	  break;
+      }
+
+      let note = pattern.timeIntervals[i].notes[0];
+      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.pitch, drum == 0 || pause ? 0 :1 ));
+      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.pitch + 3, drum == 0 || pause ? 0 :1 ));
+      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.pitch + 5, drum == 0 || pause ? 0 :1 ));
+    }
+
+    return chordsIdea;
   }
 
 
