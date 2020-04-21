@@ -189,12 +189,10 @@ module.exports = class SongGenerator {
 
     let pause = false;
 
-/*
 if(this.getRand(0,8) == 0) {
   console.log("pause drums");
   pause = true;
 }
-*/
 
     for(let i=0; i < pattern.timeIntervals.length; i++) {
 
@@ -229,12 +227,10 @@ if(this.getRand(0,8) == 0) {
 
     let pause = false;
 
-/*
 if(this.getRand(0,8) == 0) {
-  console.log("pause drums");
+  console.log("pause chords");
   pause = true;
 }
-*/
 
     for(let i=0; i < pattern.timeIntervals.length; i++) {
 
@@ -250,9 +246,9 @@ if(this.getRand(0,8) == 0) {
       }
 
       let note = pattern.timeIntervals[i].notes[0];
-      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.pitch, drum == 0 || pause ? 0 :1 ));
-      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.pitch + 3, drum == 0 || pause ? 0 :1 ));
-      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.pitch + 5, drum == 0 || pause ? 0 :1 ));
+      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.pitch, drum == 0 || pause ? 0 :4 ));
+      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.pitch + 3, drum == 0 || pause ? 0 :4 ));
+      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.pitch + 5, drum == 0 || pause ? 0 :4 ));
     }
 
     return chordsIdea;
