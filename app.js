@@ -20,9 +20,11 @@ const options = {
 };
 
 let req = http.request(options, (res) => {
-  console.log('statusCode: ${res.statusCode}');
+
+  //console.log('statusCode: ${res.statusCode}');
 
   res.on('data', (d) => {
+    //Should be json containing UUID and status
     process.stdout.write(d);
     process.exit()
   });
