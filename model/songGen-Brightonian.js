@@ -9,6 +9,10 @@ const MELOD_IX = 0;
 const CHORD_IX = 1;
 const RYTHM_IX = 2;
 
+const MIDI_KICK_DRUM = 60;
+const MIDI_HIHAT = 71;
+const MIDI_SNARE = 62;
+
 module.exports = class SongGenerator {
 
   constructor() {
@@ -185,37 +189,40 @@ module.exports = class SongGenerator {
 
     let rythmicalIdea = new MusicalPattern();
 
-    let drums = [ 14, 15 ];
-
     let pause = false;
+
 
 if(this.getRand(0,8) == 0) {
   console.log("pause drums");
   pause = true;
 }
 
+
     for(let i=0; i < pattern.timeIntervals.length; i++) {
 
       rythmicalIdea.timeIntervals.push(new TimeInterval());
 
-      //for(let j =0; j < pattern.timeIntervals[i].notes.length; i++) {
-
       let drum = 0;
-      //switch(i%8) {
-      switch((this.song.musicians[RYTHM_IX].timeIntervals.length + i)%8) {
-        case 0:
-          drum = drums[0];
-          break;
-	case 2:
-	case 4:
-	case 6:
-	  drum = drums[1];
-	  break;
+
+      let p = (this.song.musicians[RYTHM_IX].timeIntervals.length + i)%8;
+
+      if(p%4 == 0) {
+          rythmicalIdea.timeIntervals[i].notes.push(
+	    new MusicNote( 10, MIDI_KICK_DRUM, pause ? 0 :1 )
+          );
       }
 
-      rythmicalIdea.timeIntervals[i].notes.push(
-	new MusicNote( 10, drum, drum == 0 || pause ? 0 :1 )
-      );
+      if(p%4 == 2) {
+          rythmicalIdea.timeIntervals[i].notes.push(
+	    new MusicNote( 10, MIDI_SNARE, pause ? 0 :1 )
+          );
+      }
+
+      if(p%2 == 0) {
+          rythmicalIdea.timeIntervals[i].notes.push(
+	    new MusicNote( 10, MIDI_HIHAT, pause ? 0 :1 )
+          );
+      }
     }
 
     return rythmicalIdea;
