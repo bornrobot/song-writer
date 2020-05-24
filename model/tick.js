@@ -1,20 +1,16 @@
-module.exports = class TimeInterval {
+module.exports = class Tick {
 
   constructor() {
-
     this.notes = new Array();
-
   }
 
   deepCopy() {
 
-    let copy = new TimeInterval();
+    let copy = new Tick();
 
     for(let i=0; i < this.notes.length; i++) {
-
       copy.notes.push( this.notes[i].deepCopy() );
     }
-
     return copy;
   }
 

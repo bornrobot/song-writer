@@ -3,16 +3,16 @@ module.exports = class MusicalPattern {
 
   constructor() {
 
-    this.timeIntervals = new Array();
+    this.ticks = new Array();
   }
 
   deepCopy() {
 
     let copy = new MusicalPattern();
 
-    for(let i=0; i < this.timeIntervals.length; i++) {
+    for(let i=0; i < this.ticks.length; i++) {
 
-      copy.timeIntervals.push(this.timeIntervals[i].deepCopy());
+      copy.ticks.push(this.ticks[i].deepCopy());
     }
 
     return copy;
@@ -22,9 +22,9 @@ module.exports = class MusicalPattern {
 
     let copy = new MusicalPattern();
 
-    for(let i=this.timeIntervals[i].length; i > 0; i--) {
+    for(let i=this.ticks[i].length; i > 0; i--) {
 
-      copy.timeIntervals.push(this.timeIntervals[i-1].deepCopy());
+      copy.ticks.push(this.ticks[i-1].deepCopy());
     }
 
     return copy;
@@ -34,9 +34,9 @@ module.exports = class MusicalPattern {
 
     let str = "";
 
-    for(let i=0; i < this.timeIntervals.length; i++) {
+    for(let i=0; i < this.ticks.length; i++) {
 
-      str += this.timeIntervals[i].print();
+      str += this.ticks[i].print();
     }
 
     return str;

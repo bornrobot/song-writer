@@ -1,5 +1,5 @@
 const http = require('http');
-const SongGenerator = require('./model/songGen-Brightonian');
+const SongGenerator = require('./model/song-gen');
 
 let songGen = new SongGenerator();
 songGen.create();

@@ -2,7 +2,7 @@ var Simple1dNoise = require('./Simple1dNoise');
 const MusicalPattern = require('./MusicalPattern');
 const Song = require('./song');
 const Musician = require('./musician');
-const TimeInterval = require('./timeInterval');
+const Tick = require('./tick');
 const MusicNote = require('./MusicNote');
 
 const MELOD_IX = 0;
@@ -32,7 +32,6 @@ module.exports = class SongGenerator {
 
   create() {
     this.song = new Song();
-
     this.song.BandName = "Brightonian";
     this.song.Tempo = 110 + (Math.random() * 20); //BPM;
     this.song.Tempo = Math.floor(this.song.Tempo);
@@ -62,9 +61,9 @@ module.exports = class SongGenerator {
     this.musicalIdea = new MusicalPattern();
     for(let i =0; i < ideaLen; i++) {
 
-      this.musicalIdea.timeIntervals.push( new TimeInterval() );
+      this.musicalIdea.ticks.push( new Tick() );
 
-      this.musicalIdea.timeIntervals[i].notes.push( 
+      this.musicalIdea.ticks[i].notes.push( 
         new MusicNote( 1, this.song.KeyOffset, poff, -1, 1)
       );
 
@@ -101,7 +100,7 @@ module.exports = class SongGenerator {
     let nextChordsPattern = this.createChordsFromMelody(nextMelodyPattern);
     let nextRythmPattern = this.createRythmFromMelody(nextMelodyPattern);
 
-    for(let i = 0; this.song.musicians[MELOD_IX].timeIntervals.length < MAX_TICKS; i++) {
+    for(let i = 0; this.song.musicians[MELOD_IX].ticks.length < MAX_TICKS; i++) {
 
       this.addToMelody(nextMelodyPattern);
       this.addToTrack(CHORD_IX, nextChordsPattern);
@@ -125,26 +124,26 @@ module.exports = class SongGenerator {
 
     let track = this.song.musicians[MELOD_IX];
 
-    let ival = track.timeIntervals.length -1;
+    let ival = track.ticks.length -1;
 
-    for(let i=0; i < pattern.timeIntervals.length && ival < MAX_TICKS -1; i++) {
+    for(let i=0; i < pattern.ticks.length && ival < MAX_TICKS -1; i++) {
 
-      track.timeIntervals.push( new TimeInterval() );
+      track.ticks.push( new Tick() );
       ival++;
 
-      for(let j=0; j < pattern.timeIntervals[i].notes.length; j++) {
-        track.timeIntervals[ival].notes.push( pattern.timeIntervals[i].notes[j].deepCopy() );
+      for(let j=0; j < pattern.ticks[i].notes.length; j++) {
+        track.ticks[ival].notes.push( pattern.ticks[i].notes[j].deepCopy() );
       }
 
       this.ticks++;
     }
 
-    if(track.timeIntervals.length == MAX_TICKS -1) {
+    if(track.ticks.length == MAX_TICKS -1) {
 
-      track.timeIntervals.push( new TimeInterval() );
+      track.ticks.push( new Tick() );
 
-      track.timeIntervals[ival].notes.push( 
-        new Array(track.timeIntervals[0].notes[0].deepCopy())
+      track.ticks[ival].notes.push( 
+        new Array(track.ticks[0].notes[0].deepCopy())
       );
     }
   }
@@ -154,21 +153,21 @@ module.exports = class SongGenerator {
     let track = this.song.musicians[trackIndex]; 
 
     //set the tix to the end of the track...
-    let tix = track.timeIntervals.length; // -1;
+    let tix = track.ticks.length; // -1;
 
     //for each time interval in the pattern...
-    console.log("pattern interval count:" + pattern.timeIntervals.length);
+    console.log("pattern interval count:" + pattern.ticks.length);
     console.log("total interval count:" + MAX_TICKS);
 
-    for(let i=0; i < pattern.timeIntervals.length && tix+i < MAX_TICKS; i++) {
+    for(let i=0; i < pattern.ticks.length && tix+i < MAX_TICKS; i++) {
 
       //Add a new time interval to the track with the notes from the pattern...
-      track.timeIntervals.push( new TimeInterval() );
+      track.ticks.push( new Tick() );
 
       //copy each of the pattern notes in this interval...
-      for(let j=0; j < pattern.timeIntervals[i].notes.length; j++) {
-        track.timeIntervals[tix + i].notes.push(
-          pattern.timeIntervals[i].notes[j].deepCopy()
+      for(let j=0; j < pattern.ticks[i].notes.length; j++) {
+        track.ticks[tix + i].notes.push(
+          pattern.ticks[i].notes[j].deepCopy()
         );
       }
     } 
@@ -187,28 +186,28 @@ module.exports = class SongGenerator {
       pause = true;
     }
 
-    for(let i=0; i < pattern.timeIntervals.length; i++) {
+    for(let i=0; i < pattern.ticks.length; i++) {
 
-      rythmicalIdea.timeIntervals.push(new TimeInterval());
+      rythmicalIdea.ticks.push(new Tick());
 
       let drum = 0;
 
-      let p = (this.song.musicians[RYTHM_IX].timeIntervals.length + i)%8;
+      let p = (this.song.musicians[RYTHM_IX].ticks.length + i)%8;
 
       if(p%4 == 0) {
-          rythmicalIdea.timeIntervals[i].notes.push(
+          rythmicalIdea.ticks[i].notes.push(
 	    new MusicNote( 10, -1, -1, MIDI_KICK_DRUM, pause ? 0 :1 )
           );
       }
 
       if(p%4 == 2) {
-          rythmicalIdea.timeIntervals[i].notes.push(
+          rythmicalIdea.ticks[i].notes.push(
 	    new MusicNote( 10, -1, -1, MIDI_SNARE, pause ? 0 :1 )
           );
       }
 
       if(p%2 == 0) {
-          rythmicalIdea.timeIntervals[i].notes.push(
+          rythmicalIdea.ticks[i].notes.push(
 	    new MusicNote( 10, -1, -1, MIDI_HIHAT, pause ? 0 :1 )
           );
       }
@@ -229,9 +228,9 @@ module.exports = class SongGenerator {
       paused = true;
     }
 
-    for(let i=0; i < pattern.timeIntervals.length; i++) {
+    for(let i=0; i < pattern.ticks.length; i++) {
 
-      chordsIdea.timeIntervals.push(new TimeInterval());
+      chordsIdea.ticks.push(new Tick());
 
       if(!paused && i%8 == 0) {
         sus = 4;
@@ -239,17 +238,19 @@ module.exports = class SongGenerator {
         sus = 0;
       }
 
-      let note = pattern.timeIntervals[i].notes[0];
+      let note = pattern.ticks[i].notes[0];
 
-      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.keyoff, note.poff, -1, sus ));
-      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.keyoff, note.poff + 3, -1, sus ));
-      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.keyoff, note.poff + 5, -1, sus ));
+      chordsIdea.ticks[i].notes.push( new MusicNote( 2, note.keyoff, note.poff, -1, sus ));
+      chordsIdea.ticks[i].notes.push( new MusicNote( 2, note.keyoff, note.poff + 3, -1, sus ));
+      chordsIdea.ticks[i].notes.push( new MusicNote( 2, note.keyoff, note.poff + 5, -1, sus ));
     }
 
     return chordsIdea;
   }
 
   developIdea(pattern){
+
+    console.log("developing pattern...");
 
     let newPattern;
 
@@ -261,42 +262,38 @@ module.exports = class SongGenerator {
 
     while(1) {
 
-      let count  = Math.pow(2, this.getRand(0, 4));
-      console.log("repeat " + count + " times");
+      let count = Math.pow(2, this.getRand(0, 4));
 
-      if(newPattern.timeIntervals.length > count) {
+      console.log("resize new pattern from " + pattern.ticks.length + " to " + count);
+     
+      if(newPattern.ticks.length > count) {
 
-        //Remove any excess timeIntervals...
-        while(newPattern.timeIntervals.length > count) { 
-          newPattern.timeIntervals.pop();
+        console.log("Remove " + (newPattern.ticks.length - count) +  " ticks...");
+        while(newPattern.ticks.length > count) { 
+          newPattern.ticks.pop();
         }
+      } else if(newPattern.ticks.length < count) {
 
-      } else if(newPattern.timeIntervals.length < count) {
+        console.log("Add " + (count - newPattern.ticks.length) +  " ticks...");
 
-        //Add some additional timeIntervals...
         let j = 0;
-        while(newPattern.timeIntervals.length < count) {
+        while(newPattern.ticks.length < count) {
 
-          let newTimeInt = new TimeInterval();
-          newTimeInt.notes.push( newPattern.timeIntervals[j].deepCopy() );
+          newPattern.ticks.push(newPattern.ticks[j].deepCopy() );
 
-          newPattern.timeIntervals.push(newTimeInt);
-          j++;
-
-          if(j == newPattern.timeIntervals.length) {
+          if(j++ == newPattern.ticks.length) {
             j=0;
           }	
         }
-
       }
 
-      //foreach timeInterval adjust the notes...
+      //foreach tick adjust the notes...
 
-      for(let i=0; i < newPattern.timeIntervals.length; i++) {
+      for(let i=0; i < newPattern.ticks.length; i++) {
 
-        let oldTimeInterval = newPattern.timeIntervals[i].deepCopy();
+        let oldTick = newPattern.ticks[i].deepCopy();
 
-        if(1) { //if(this.getRand(0,20) == 0) {
+        if(this.getRand(0,20) == 0) {
 
           let rand = this.getNoise(this.ticks + i);
 
@@ -307,47 +304,46 @@ module.exports = class SongGenerator {
           console.log("random adjustment: " + randomAdjustment);
 
 	  //Make a random pitch adjustment...
-	  for(let j=0; j < newPattern.timeIntervals[i].notes.length; j++) {
+	  for(let j=0; j < newPattern.ticks[i].notes.length; j++) {
 
             console.log("is this a note?");
-            console.log(newPattern.timeIntervals[i].notes[j]);
+            console.log(newPattern.ticks[i].notes[j]);
 
-            newPattern.timeIntervals[i].notes[j].adjustPoff(randomAdjustment);
+            newPattern.ticks[i].notes[j].adjustPoff(randomAdjustment);
           }
         }
 
-        for(let j=0; j < newPattern.timeIntervals[i].notes.length; j++) {
+        for(let j=0; j < newPattern.ticks[i].notes.length; j++) {
 
-          newPattern.timeIntervals[i].notes[j].sustain = 2;
+          newPattern.ticks[i].notes[j].sustain = 2;
         }
 
         //dont always change the sustain, dont let the last note last too long...
-        if(this.getRand(0,4) ==0  && i < newPattern.timeIntervals.length -1) {
+        if(this.getRand(0,4) ==0  && i < newPattern.ticks.length -1) {
 
           let randomSustain = this.getRand(1, 4);
 
-          for(let j=0; j < newPattern.timeIntervals[i].notes.length; j++) {
-            newPattern.timeIntervals[i].notes[j].sustain = randomSustain;
+          for(let j=0; j < newPattern.ticks[i].notes.length; j++) {
+            newPattern.ticks[i].notes[j].sustain = randomSustain;
           }
         }
 
         //dont always play a note...
         if(this.getRand(0,5) == 0) {
 
-          for(let j=0; j < newPattern.timeIntervals[i].notes.length; j++) {
-            newPattern.timeIntervals[i].notes[j].sustain = 0;
+          for(let j=0; j < newPattern.ticks[i].notes.length; j++) {
+            newPattern.ticks[i].notes[j].sustain = 0;
           }
         }
 
         //Check the previous note and if its a long one then turn this one off...
-        if(i > 0 && newPattern.timeIntervals[i-1].notes[0].sustain > 1) {
+        if(i > 0 && newPattern.ticks[i-1].notes[0].sustain > 1) {
 
-          for(let j=0; j < newPattern.timeIntervals[i].notes.length; j++) {
+          for(let j=0; j < newPattern.ticks[i].notes.length; j++) {
 
-            newPattern.timeIntervals[i].notes[j].sustain = 0;
+            newPattern.ticks[i].notes[j].sustain = 0;
           }
         }
-
       }
 
 //randomly change some stuff based on some factors - positionInSong, tension
