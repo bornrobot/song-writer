@@ -13,37 +13,22 @@ const MIDI_KICK_DRUM = 60;
 const MIDI_HIHAT = 71;
 const MIDI_SNARE = 62;
 
-const MAX_TICKS = 24 * 4 *2;
+const MAX_TICKS = 24;
 
 module.exports = class SongGenerator {
 
   constructor() {
   }
 
-  getNoise(tick) {
-    return Math.floor(this.generator.getVal(tick));
-  }
-
-  getRand(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
-  }
-
   create() {
     this.song = new Song();
-    this.song.BandName = "Brightonian";
-    this.song.Tempo = 80 + (Math.random() * 40); //BPM;
-    this.song.Tempo = Math.floor(this.song.Tempo);
+    this.song.BandName = "Test";
+    this.song.Tempo = 80; //BPM;
 	  
     // { -6 ... +6 } //semi-tone offset from C4
-    this.song.KeyOffset = this.getRand(0,12) -6;
+    this.song.KeyOffset = -6;
 
     this.ticks = 0;
-
-    this.generator = new Simple1dNoise();
-    this.generator.setScale(1);
-    this.generator.setAmplitude(14);
 
     this.createIdea();
     this.buildOnIdea();
@@ -68,7 +53,7 @@ module.exports = class SongGenerator {
       );
 
       //Adjust the pitch by some amount...
-      poff = Math.floor(this.getNoise(i));
+      poff = poff+1;
     }
 
     console.log("Musical idea:");
@@ -106,11 +91,7 @@ module.exports = class SongGenerator {
       this.addToTrack(CHORD_IX, nextChordsPattern);
       this.addToTrack(RYTHM_IX, nextRythmPattern);
 
-      if(this.getRand(0,10) > 0) { 
-        nextMelodyPattern = this.developIdea(this.musicalIdea);
-      } else {
- 	nextMelodyPattern = this.developIdea(nextMelodyPattern);
-      }
+      nextMelodyPattern = this.developIdea(nextMelodyPattern);
 
       nextChordsPattern = this.createChordsFromMelody(nextMelodyPattern);
       nextRythmPattern = this.createRythmFromMelody(nextMelodyPattern);
@@ -180,12 +161,6 @@ module.exports = class SongGenerator {
 
     let pause = false;
 
-
-    if(this.getRand(0,8) == 0) {
-      console.log("pause drums");
-      pause = true;
-    }
-
     for(let i=0; i < pattern.ticks.length; i++) {
 
       rythmicalIdea.ticks.push(new Tick());
@@ -221,28 +196,17 @@ module.exports = class SongGenerator {
     let chordsIdea = new MusicalPattern();
 
     let paused = false;
-    let sus = 0;
-
-    if(this.getRand(0,8) == 0) {
-      console.log("pause chords");
-      paused = true;
-    }
+    let sus = 1;
 
     for(let i=0; i < pattern.ticks.length; i++) {
 
       chordsIdea.ticks.push(new Tick());
 
-      if(!paused && i%8 == 0) {
-        sus = 4;
-      } else {
-        sus = 0;
-      }
-
       let note = pattern.ticks[i].notes[0];
 
-      chordsIdea.ticks[i].notes.push( new MusicNote( 2, note.keyoff, note.poff -7, -1, sus ));
-      chordsIdea.ticks[i].notes.push( new MusicNote( 2, note.keyoff, note.poff -5, -1, sus ));
-      chordsIdea.ticks[i].notes.push( new MusicNote( 2, note.keyoff, note.poff -3, -1, sus ));
+      //chordsIdea.ticks[i].notes.push( new MusicNote( 2, note.keyoff, note.poff, -1, sus ));
+      //chordsIdea.ticks[i].notes.push( new MusicNote( 2, note.keyoff, note.poff + 2, -1, sus ));
+      chordsIdea.ticks[i].notes.push( new MusicNote( 2, note.keyoff, note.poff + 4, -1, sus ));
     }
 
     return chordsIdea;
@@ -254,111 +218,15 @@ module.exports = class SongGenerator {
 
     let newPattern;
 
-    if(this.getRand(0,1) == 0) {
-      newPattern = pattern.deepCopy();
-    } else {
-      newPattern = pattern.deepCopyInvert();
-    }
-
-    while(1) {
-
-      let count = Math.pow(2, this.getRand(0, 4));
-
-      console.log("resize new pattern from " + pattern.ticks.length + " to " + count);
-     
-      if(newPattern.ticks.length > count) {
-
-        console.log("Remove " + (newPattern.ticks.length - count) +  " ticks...");
-        while(newPattern.ticks.length > count) { 
-          newPattern.ticks.pop();
-        }
-      } else if(newPattern.ticks.length < count) {
-
-        console.log("Add " + (count - newPattern.ticks.length) +  " ticks...");
-
-        let j = 0;
-        while(newPattern.ticks.length < count) {
-
-          newPattern.ticks.push(newPattern.ticks[j].deepCopy() );
-
-          if(j++ == newPattern.ticks.length) {
-            j=0;
-          }	
-        }
-      }
-
-      //foreach tick adjust the notes...
+    newPattern = pattern.deepCopy();
 
       for(let i=0; i < newPattern.ticks.length; i++) {
 
-        let oldTick = newPattern.ticks[i].deepCopy();
-
-        if(this.getRand(0,20) == 0) {
-
-          let rand = this.getNoise(this.ticks + i);
-
-          console.log("perlin noise rand: " + rand + "\n");
-
-          let randomAdjustment = rand - 7;
-
-          console.log("random adjustment: " + randomAdjustment);
-
-	  //Make a random pitch adjustment...
 	  for(let j=0; j < newPattern.ticks[i].notes.length; j++) {
 
-            console.log("is this a note?");
-            console.log(newPattern.ticks[i].notes[j]);
-
-            newPattern.ticks[i].notes[j].adjustPoff(randomAdjustment);
+            newPattern.ticks[i].notes[j].adjustPoff(7);
           }
-        }
-
-        for(let j=0; j < newPattern.ticks[i].notes.length; j++) {
-
-          newPattern.ticks[i].notes[j].sustain = 2;
-        }
-
-        //dont always change the sustain, dont let the last note last too long...
-        if(this.getRand(0,4) ==0  && i < newPattern.ticks.length -1) {
-
-          let randomSustain = this.getRand(1, 4);
-
-          for(let j=0; j < newPattern.ticks[i].notes.length; j++) {
-            newPattern.ticks[i].notes[j].sustain = randomSustain;
-          }
-        }
-
-        //dont always play a note...
-        if(this.getRand(0,5) == 0) {
-
-          for(let j=0; j < newPattern.ticks[i].notes.length; j++) {
-            newPattern.ticks[i].notes[j].sustain = 0;
-          }
-        }
-
-        //Check the previous note and if its a long one then turn this one off...
-        if(i > 0 && newPattern.ticks[i-1].notes[0].sustain > 1) {
-
-          for(let j=0; j < newPattern.ticks[i].notes.length; j++) {
-
-            newPattern.ticks[i].notes[j].sustain = 0;
-          }
-        }
       }
-
-//randomly change some stuff based on some factors - positionInSong, tension
-//Mutations:
-//question / answer,
-//peaks / troughs;
-//tension + resolving
-//create tension towards the beginning
-//resolve towards the end.
-
- //...then qualiy control with AI / tensorflow..
-      if(1 > 0.8) {
-	break;
-      }
-    }
 
     return newPattern;
   }

@@ -1,5 +1,6 @@
 const http = require('http');
 const SongGenerator = require('./model/song-gen');
+//const SongGenerator = require('./model/song-test');
 
 let songGen = new SongGenerator();
 songGen.create();
@@ -9,7 +10,7 @@ var songJson  = JSON.stringify(songGen.song);
 console.log(songJson);
 
 const options = {
-  hostname: 'localhost',
+  hostname: '192.168.20.12',
   port: 5003,
   path: '/perform',
   method: 'POST',

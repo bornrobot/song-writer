@@ -2,13 +2,6 @@
 class SongGenerator {
 
 	constructor() {
-/*
-		this.song = new Song();
-
-		this.song.BandName = "Arcade";
-		this.song.Tempo = 100 + (Math.random() * 20); //BPM;
-		this.song.KeyOffset = 0; //4;
-*/
 
 		this.MaxNotes = 12 * 4 *2;
 		this.numPatterns = 0;
@@ -21,22 +14,24 @@ class SongGenerator {
 	}
 
 	getNoise(noteIndex) {
-		//return Math.random() * 100;
+
 		return this.generator.getVal(noteIndex); // * 100;
 	}
 
 	getRand(min, max) {
+
   		min = Math.ceil(min);
 		max = Math.floor(max);
 		return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 	}
 
 	create() {
+
 		this.song = new Song();
 
 		this.song.BandName = "Arcade";
-		this.song.Tempo = 100 + (Math.random() * 20); //BPM;
-		//this.song.KeyOffset = 0; //4;
+		this.song.Tempo = 80 + (Math.random() * 40); //BPM;
+
 		this.song.KeyOffset = this.getRand(0,8) -4;
 
 		this.MaxNotes = 12 * 4 *2;
@@ -57,11 +52,11 @@ class SongGenerator {
 
 		let ideaLength = 8;
 
-		//Start wiht Middle C
+		//Start with Middle C
 		let pitch = 14 + this.song.KeyOffset;
 
 		let idea = new Array();
-		for(let i =0; i < ideaLength; i++) {
+		for(let i=0; i < ideaLength; i++) {
 
 			idea.push(
 				new MusicNote( 1, pitch + this.getRand(0,8), 1)
@@ -72,7 +67,6 @@ class SongGenerator {
 		this.musicalIdea = new MusicalPattern(idea);
 
 		console.log(this.musicalIdea.print());
-		$("#span-musicalIdea").text(this.musicalIdea.print());
 
 		this.addToMelody( this.musicalIdea );
 	}

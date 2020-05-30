@@ -242,8 +242,8 @@ module.exports = class SongGenerator {
       let note = pattern.timeIntervals[i].notes[0];
 
       chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.keyoff, note.poff, -1, sus ));
-      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.keyoff, note.poff + 3, -1, sus ));
-      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.keyoff, note.poff + 5, -1, sus ));
+      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.keyoff, note.poff + 2, -1, sus ));
+      chordsIdea.timeIntervals[i].notes.push( new MusicNote( 2, note.keyoff, note.poff + 4, -1, sus ));
     }
 
     return chordsIdea;

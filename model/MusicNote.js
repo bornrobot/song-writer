@@ -45,6 +45,9 @@ module.exports = class MusicNote {
 
   getChromaticPitchFromMajorDiatonicPitch()
   {
+    //1 2 3 4 5 6 7
+    //0 1 2 3 4 5 6
+
     const chromMap = [ 0, 2, 4, 5, 7, 9, 11 ];
 
     let octoff = Math.floor(this.poff / 7);
